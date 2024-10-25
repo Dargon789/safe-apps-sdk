@@ -1,0 +1,59 @@
+{
+	"compiler": {
+		"version": "0.7.6+commit.7338295f"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "getAccount",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			".deps/remix-tests/remix_accounts.sol": "TestsAccounts"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		".deps/remix-tests/remix_accounts.sol": {
+			"keccak256": "0xb662c756e376361742308a8e37f7a56fd83bc7852295839d389e647d1b290b54",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://f1ca3d09bd4b0c897428166c5a96a55c70cb67c955d6419e919b2e8181238d1a",
+				"dweb:/ipfs/Qmevh52AhedsWdHFbmVo1hKjog25gSP8EiKoWSTeRwExef"
+			]
+		}
+	},
+	"version": 1
+}
