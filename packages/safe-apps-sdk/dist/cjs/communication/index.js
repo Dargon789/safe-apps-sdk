@@ -33,7 +33,7 @@ class PostMessageCommunicator {
             return !emptyOrMalformed && sentFromParentEl && allowedSDKVersion && validOrigin;
         };
         this.logIncomingMessage = (msg) => {
-            console.info(`Safe Apps SDK v1: A message was received from origin ${msg.origin}. `, msg.data);
+            console.info("Safe Apps SDK v1: A message was received from origin %s. ", msg.origin, msg.data);
         };
         this.onParentMessage = (msg) => {
             if (this.isValidMessage(msg)) {
