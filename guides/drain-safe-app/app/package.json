@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.11.1",
+    "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.0",
     "@safe-global/safe-apps-react-sdk": "^4.7.0",
