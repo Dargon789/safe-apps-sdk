@@ -5,13 +5,13 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^5.15.0",
+    "@mui/material": "^7.0.1",
     "@safe-global/safe-apps-react-sdk": "^4.7.2",
     "@safe-global/safe-react-components": "^2.0.6",
     "react": "^18.2.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.1.0",
     "react-scripts": "^5.0.1",
-    "viem": "^2.23.6"
+    "viem": "^2.25.0"
   },
   "scripts": {
     "start": "react-scripts start",
