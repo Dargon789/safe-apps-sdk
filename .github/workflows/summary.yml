@@ -19,8 +19,11 @@ jobs:
       - name: Preprocess issue body
         id: body_preprocess
         shell: bash
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          body="${{ github.event.issue.body }}"
+          # Use ISSUE_BODY environment variable
+          body="$ISSUE_BODY"
           # Strip code fences and images
           cleaned=$(echo "$body" \
             | sed 's/```[^`]*```//g' \
