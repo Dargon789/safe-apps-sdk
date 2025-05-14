@@ -16,6 +16,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Preprocess issue body
+        id: body_preprocess
+        shell: bash
+        run: |
+          body="${{ github.event.issue.body }}"
+          # Strip code fences and images
+          cleaned=$(echo "$body" \
+            | sed 's/```[^`]*```//g' \
+            | sed 's/!\[.*\](.*)//g')
+          # Truncate to first 1000 characters
+          truncated=$(echo "$cleaned" | head -c 1000)
+          echo "truncated_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$truncated" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Run AI inference
         id: inference
         uses: actions/ai-inference@v1
@@ -23,7 +38,7 @@ jobs:
           prompt: |
             Summarize the following GitHub issue in one paragraph:
             Title: ${{ github.event.issue.title }}
-            Body: ${{ github.event.issue.body }}
+            Body: ${{ steps.body_preprocess.outputs.truncated_body }}
 
       - name: Comment with AI summary
         run: |
