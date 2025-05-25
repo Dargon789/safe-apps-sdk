@@ -24,7 +24,7 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --no-frozen-lockfile
 
       - name: Create Version/Changelogs Pull Request or Create Github Releases
         id: changesets
