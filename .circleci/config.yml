@@ -7,7 +7,6 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@3.3.1
 
-
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
