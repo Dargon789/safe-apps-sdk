@@ -28,9 +28,11 @@ class PostMessageCommunicator {
         this.handleIncomingMessage = (payload) => {
             const { id } = payload;
             const cb = this.callbacks.get(id);
-            if (cb) {
+            if (typeof cb === 'function') {
                 cb(payload);
                 this.callbacks.delete(id);
+            } else {
+                console.error(`Callback for id ${id} is not a function or does not exist.`);
             }
         };
         this.send = (method, params) => {
