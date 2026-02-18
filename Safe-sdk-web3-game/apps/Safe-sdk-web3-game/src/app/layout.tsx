@@ -1,5 +1,6 @@
 import './global.css';
 import { StyledComponentsRegistry } from './registry';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: 'Welcome to demo2',
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+        <Analytics />
       </body>
     </html>
   );
