@@ -194,12 +194,10 @@ class Safe {
         ],
       };
 
-      console.log('useOffChainSignatures', payload);
       const response = await this.communicator.send<Methods.rpcCall, RPCPayload<[boolean]>, boolean>(
         Methods.rpcCall,
         payload,
       );
-      console.log('useOffChainSignatures', reponse);
       return response.data;
     } catch (err) {
       return false;
