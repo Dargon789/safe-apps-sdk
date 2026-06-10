@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SafeAppProvider = void 0;
+const safe_apps_sdk_1 = require("@safe-global/safe-apps-sdk");
 const events_1 = require("events");
 const utils_1 = require("./utils");
 // The API is based on Ethereum JavaScript API Provider Standard. Link: https://eips.ethereum.org/EIPS/eip-1193
@@ -29,22 +30,24 @@ class SafeAppProvider extends events_1.EventEmitter {
                 return [this.safe.safeAddress];
             case 'net_version':
             case 'eth_chainId':
-                return `0x${this.chainId.toString(16)}`;
+                return (0, utils_1.numberToHex)(this.chainId);
             case 'personal_sign': {
                 const [message, address] = params;
                 if (this.safe.safeAddress.toLowerCase() !== address.toLowerCase()) {
                     throw new Error('The address or message hash is invalid');
                 }
-                await this.sdk.txs.signMessage(message);
-                return '0x';
+                const response = await this.sdk.txs.signMessage(message);
+                const signature = 'signature' in response ? response.signature : undefined;
+                return signature || '0x';
             }
             case 'eth_sign': {
                 const [address, messageHash] = params;
                 if (this.safe.safeAddress.toLowerCase() !== address.toLowerCase() || !messageHash.startsWith('0x')) {
                     throw new Error('The address or message hash is invalid');
                 }
-                await this.sdk.txs.signMessage(messageHash);
-                return '0x';
+                const response = await this.sdk.txs.signMessage(messageHash);
+                const signature = 'signature' in response ? response.signature : undefined;
+                return signature || '0x';
             }
             case 'eth_signTypedData':
             case 'eth_signTypedData_v4': {
@@ -53,13 +56,26 @@ class SafeAppProvider extends events_1.EventEmitter {
                 if (this.safe.safeAddress.toLowerCase() !== address.toLowerCase()) {
                     throw new Error('The address is invalid');
                 }
-                await this.sdk.txs.signTypedMessage(parsedTypedData);
-                return '0x';
+                const response = await this.sdk.txs.signTypedMessage(parsedTypedData);
+                const signature = 'signature' in response ? response.signature : undefined;
+                return signature || '0x';
             }
             case 'eth_sendTransaction':
-                const tx = Object.assign({ value: '0', data: '0x' }, params[0]);
+                // `value` or `data` can be explicitly set as `undefined` for example in Viem. The spread will overwrite the fallback value.
+                const tx = {
+                    ...params[0],
+                    value: params[0].value || '0',
+                    data: params[0].data || '0x',
+                };
+                // Some ethereum libraries might pass the gas as a hex-encoded string
+                // We need to convert it to a number because the SDK expects a number and our backend only supports
+                // Decimal numbers
+                if (typeof tx.gas === 'string' && tx.gas.startsWith('0x')) {
+                    tx.gas = parseInt(tx.gas, 16);
+                }
                 const resp = await this.sdk.txs.send({
                     txs: [tx],
+                    params: { safeTxGas: tx.gas },
                 });
                 // Store fake transaction
                 this.submittedTxs.set(resp.safeTxHash, {
@@ -138,6 +154,87 @@ class SafeAppProvider extends events_1.EventEmitter {
                 return this.sdk.wallet.getPermissions();
             case 'wallet_requestPermissions':
                 return this.sdk.wallet.requestPermissions(params[0]);
+            case 'safe_setSettings':
+                return this.sdk.eth.setSafeSettings([params[0]]);
+            case 'wallet_sendCalls': {
+                const { from, calls, chainId } = params[0];
+                if (chainId !== (0, utils_1.numberToHex)(this.chainId)) {
+                    throw new Error(`Safe is not on chain ${chainId}`);
+                }
+                if (from !== this.safe.safeAddress) {
+                    throw Error('Invalid from address');
+                }
+                const txs = calls.map((call, i) => {
+                    if (!call.to) {
+                        throw new Error(`Invalid call #${i}: missing "to" field`);
+                    }
+                    return {
+                        to: call.to,
+                        data: call.data ?? '0x',
+                        value: call.value ?? (0, utils_1.numberToHex)(0),
+                    };
+                });
+                const { safeTxHash } = await this.sdk.txs.send({ txs });
+                const result = {
+                    id: safeTxHash,
+                };
+                return result;
+            }
+            case 'wallet_getCallsStatus': {
+                const safeTxHash = params[0];
+                const CallStatus = {
+                    [safe_apps_sdk_1.TransactionStatus.AWAITING_CONFIRMATIONS]: 100,
+                    [safe_apps_sdk_1.TransactionStatus.AWAITING_EXECUTION]: 100,
+                    [safe_apps_sdk_1.TransactionStatus.SUCCESS]: 200,
+                    [safe_apps_sdk_1.TransactionStatus.CANCELLED]: 400,
+                    [safe_apps_sdk_1.TransactionStatus.FAILED]: 500,
+                };
+                const tx = await this.sdk.txs.getBySafeTxHash(safeTxHash);
+                const result = {
+                    version: '1.0',
+                    id: safeTxHash,
+                    chainId: (0, utils_1.numberToHex)(this.chainId),
+                    status: CallStatus[tx.txStatus],
+                };
+                // Transaction is queued
+                if (!tx.txHash) {
+                    return result;
+                }
+                // If transaction is executing, receipt is null
+                const receipt = await this.sdk.eth.getTransactionReceipt([tx.txHash]);
+                if (!receipt) {
+                    return result;
+                }
+                const calls = tx.txData?.dataDecoded?.method !== 'multiSend'
+                    ? 1
+                    : // Number of batched transactions
+                        tx.txData.dataDecoded.parameters?.[0].valueDecoded?.length ?? 1;
+                // Typed as number; is hex
+                const blockNumber = Number(receipt.blockNumber);
+                const gasUsed = Number(receipt.gasUsed);
+                result.receipts = Array(calls).fill({
+                    logs: receipt.logs,
+                    status: (0, utils_1.numberToHex)(tx.txStatus === safe_apps_sdk_1.TransactionStatus.SUCCESS ? 1 : 0),
+                    blockHash: receipt.blockHash,
+                    blockNumber: (0, utils_1.numberToHex)(blockNumber),
+                    gasUsed: (0, utils_1.numberToHex)(gasUsed),
+                    transactionHash: tx.txHash,
+                });
+                return result;
+            }
+            case 'wallet_showCallsStatus': {
+                // Cannot open transaction details page via SDK
+                throw new Error(`"${request.method}" not supported`);
+            }
+            case 'wallet_getCapabilities': {
+                return {
+                    [(0, utils_1.numberToHex)(this.chainId)]: {
+                        atomicBatch: {
+                            supported: true,
+                        },
+                    },
+                };
+            }
             default:
                 throw Error(`"${request.method}" not implemented`);
         }

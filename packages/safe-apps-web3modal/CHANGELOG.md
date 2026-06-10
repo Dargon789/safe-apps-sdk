@@ -1,4 +1,98 @@
-# @gnosis.pm/safe-apps-web3modal
+# @safe-global/safe-apps-web3modal
+
+## 23.0.0
+
+### Patch Changes
+
+- Updated dependencies [e0710be]
+- Updated dependencies [55342f0]
+- Updated dependencies [2cc8919]
+  - @safe-global/safe-apps-sdk@9.1.0
+  - @safe-global/safe-apps-provider@0.18.3
+
+## 22.0.0
+
+### Patch Changes
+
+- Updated dependencies [767e262]
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0
+  - @safe-global/safe-apps-provider@0.18.2
+
+## 22.0.0-next.0
+
+### Patch Changes
+
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0-next.0
+  - @safe-global/safe-apps-provider@0.18.1-next.0
+
+## 21.0.0
+
+### Minor Changes
+
+- b24cde9: chore: bump dependencies
+
+### Patch Changes
+
+- Updated dependencies [077d2cc]
+- Updated dependencies [b24cde9]
+  - @safe-global/safe-apps-provider@0.18.0
+  - @safe-global/safe-apps-sdk@8.1.0
+
+## 20.0.0
+
+### Patch Changes
+
+- Updated dependencies [dfb7fae]
+  - @safe-global/safe-apps-sdk@8.0.0
+  - @safe-global/safe-apps-provider@0.17.1
+
+## 19.0.2
+
+### Patch Changes
+
+- Updated dependencies [bdae5af]
+  - @safe-global/safe-apps-provider@0.17.0
+  - @safe-global/safe-apps-sdk@7.11.0
+
+## 19.0.1
+
+### Patch Changes
+
+- Updated dependencies [d759219]
+  - @safe-global/safe-apps-sdk@7.10.1
+  - @safe-global/safe-apps-provider@0.16.1
+
+## 19.0.0
+
+### Patch Changes
+
+- Updated dependencies [f89c36f]
+  - @safe-global/safe-apps-provider@0.16.0
+  - @safe-global/safe-apps-sdk@7.10.0
+
+## 18.0.0
+
+### Patch Changes
+
+- Updated dependencies [6bdd4f9]
+  - @safe-global/safe-apps-sdk@7.9.0
+  - @safe-global/safe-apps-provider@0.15.2
+
+## 17.0.4
+
+### Patch Changes
+
+- Updated dependencies [b6c00b8]
+  - @gnosis.pm/safe-apps-provider@0.15.1
+
+## 17.0.3
+
+### Patch Changes
+
+- Updated dependencies [6762218]
+  - @gnosis.pm/safe-apps-provider@0.15.0
 
 ## 17.0.2
 

@@ -1,4 +1,4 @@
-import { RPC_CALLS } from '../eth/constants';
+import { RPC_CALLS } from '../eth/constants.js';
 
 export type RpcCallNames = keyof typeof RPC_CALLS;
 
@@ -96,4 +96,8 @@ export interface BlockTransactionObject extends BlockTransactionBase {
 
 export interface BlockTransactionString extends BlockTransactionBase {
   transactions: string[];
+}
+
+export interface SafeSettings {
+  offChainSigning?: boolean;
 }

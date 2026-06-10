@@ -1,12 +1,11 @@
-import { ChainInfo as _ChainInfo } from '@gnosis.pm/safe-react-gateway-sdk';
-import { BigNumberish, BytesLike } from 'ethers';
+import { ChainInfo as _ChainInfo } from '@safe-global/safe-gateway-typescript-sdk';
 
 export type ChainInfo = Pick<
   _ChainInfo,
   'chainName' | 'chainId' | 'shortName' | 'nativeCurrency' | 'blockExplorerUriTemplate'
 >;
 
-export { NativeCurrency } from '@gnosis.pm/safe-react-gateway-sdk';
+export { NativeCurrency } from '@safe-global/safe-gateway-typescript-sdk';
 
 export type BaseTransaction = {
   to: string;
@@ -36,9 +35,9 @@ export type SignMessageParams = {
 export interface TypedDataDomain {
   name?: string;
   version?: string;
-  chainId?: BigNumberish;
+  chainId?: string | number | bigint | { toNumber: () => number };
   verifyingContract?: string;
-  salt?: BytesLike;
+  salt?: string;
 }
 
 export interface TypedDataTypes {
@@ -52,6 +51,7 @@ export type EIP712TypedData = {
   domain: TypedDataDomain;
   types: TypedMessageTypes;
   message: Record<string, any>;
+  primaryType?: string;
 };
 
 export type SignTypedMessageParams = {
@@ -62,12 +62,27 @@ export type SendTransactionsResponse = {
   safeTxHash: string;
 };
 
+export type OffChainSignMessageResponse = {
+  messageHash: string;
+};
+
+export type SignMessageResponse = SendTransactionsResponse | OffChainSignMessageResponse;
+
 export type SafeInfo = {
   safeAddress: string;
   chainId: number;
   threshold: number;
   owners: string[];
   isReadOnly: boolean;
+};
+
+export type SafeInfoExtended = SafeInfo & {
+  nonce: number;
+  implementation: string;
+  modules: string[] | null;
+  fallbackHandler: string | null;
+  guard: string | null;
+  version: string | null;
 };
 
 export type EnvironmentInfo = {

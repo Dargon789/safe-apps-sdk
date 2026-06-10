@@ -1,54 +1,50 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
-import { WagmiConfig, configureChains, createClient, defaultChains } from 'wagmi';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { SafeConnector } from '@gnosis.pm/safe-apps-wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-
+import { mainnet, goerli } from 'viem/chains';
+import { WagmiProvider, createConfig, CreateConnectorFn, http } from 'wagmi';
 import { Buffer } from 'buffer';
+import { metaMask } from 'wagmi/connectors';
+import { safe } from 'wagmi/connectors';
+import { injected } from 'wagmi/connectors';
+import { walletConnect } from 'wagmi/connectors';
 
 import { App } from './App';
 import reportWebVitals from './reportWebVitals';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // polyfill Buffer for client
 if (!window.Buffer) {
   window.Buffer = Buffer;
 }
 
-const alchemyId = process.env.REACT_APP_ALCHEMY_ID;
+const WALLETCONNECT_PROJECT_ID = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
 
-const { chains, provider } = configureChains(defaultChains, [alchemyProvider({ apiKey: alchemyId })]);
+let connectors: CreateConnectorFn[] = [safe(), metaMask(), injected()];
 
-const client = createClient({
-  connectors: [
-    new SafeConnector({ chains }),
-    new MetaMaskConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        qrcode: true,
-      },
-    }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: 'Injected',
-        shimDisconnect: true,
-      },
-    }),
-  ],
-  provider,
+if (WALLETCONNECT_PROJECT_ID) {
+  // A WalletConnect ID is provided so we add the Connector for testing purposes
+  connectors = [...connectors, walletConnect({ projectId: WALLETCONNECT_PROJECT_ID })];
+}
+
+const queryClient = new QueryClient();
+const config = createConfig({
+  connectors,
+  chains: [mainnet, goerli],
+  transports: {
+    [mainnet.id]: http(),
+    [goerli.id]: http(),
+  },
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    <WagmiConfig client={client}>
-      <App />
-    </WagmiConfig>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </WagmiProvider>
   </React.StrictMode>,
 );
 

@@ -1,24 +1,23 @@
 {
   "name": "example-safe-apps-wagmi-cra",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
-    "@gnosis.pm/safe-apps-provider": "^0.14.0",
-    "@gnosis.pm/safe-apps-sdk": "^7.7.0",
-    "@gnosis.pm/safe-apps-wagmi": "1.1.0",
-    "@types/react": "^18.0.23",
-    "@types/react-dom": "^18.0.3",
-    "@wagmi/core": "^0.6.6",
+    "@tanstack/react-query": "^5.17.15",
     "buffer": "^6.0.3",
-    "ethers": "^5.7.2",
     "events": "^3.3.0",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "util": "^0.12.5",
-    "wagmi": "^0.7.7",
-    "web-vitals": "^3.0.4"
+    "viem": "^2.1.1",
+    "wagmi": "^2.2.1",
+    "web-vitals": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10"
   },
   "scripts": {
     "start": "react-scripts start",

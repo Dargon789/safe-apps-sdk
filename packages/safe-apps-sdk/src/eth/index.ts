@@ -1,4 +1,4 @@
-import { RPC_CALLS } from '../eth/constants';
+import { RPC_CALLS } from '../eth/constants.js';
 import {
   BlockNumberArg,
   RpcCallNames,
@@ -11,8 +11,9 @@ import {
   TransactionConfig,
   Web3TransactionReceiptObject,
   PastLogsOptions,
-} from '../types';
-import { Methods } from '../communication/methods';
+  SafeSettings,
+} from '../types/index.js';
+import { Methods } from '../communication/methods.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Formatter = (arg: any) => any;
@@ -42,6 +43,7 @@ class Eth {
   public getTransactionCount;
   public getGasPrice;
   public getEstimateGas;
+  public setSafeSettings;
 
   private readonly communicator: Communicator;
 
@@ -94,6 +96,9 @@ class Eth {
       this.buildRequest<[TransactionConfig], number>({
         call: RPC_CALLS.eth_estimateGas,
       })([transaction]);
+    this.setSafeSettings = this.buildRequest<[SafeSettings], SafeSettings>({
+      call: RPC_CALLS.safe_setSettings,
+    });
   }
 
   private buildRequest<P = never[], R = unknown>(args: BuildRequestArgs) {

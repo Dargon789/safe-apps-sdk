@@ -1,10 +1,9 @@
-import { ethers } from 'ethers';
-import { EIP_1271_INTERFACE, EIP_1271_BYTES_INTERFACE, MAGIC_VALUE_BYTES, MAGIC_VALUE } from './signatures';
-import { Methods } from '../communication/methods';
-import { RPC_CALLS } from '../eth/constants';
+import { encodeFunctionData, Address, hashMessage, hashTypedData } from 'viem';
+import { MAGIC_VALUE_BYTES, MAGIC_VALUE } from './signatures.js';
+import { Methods } from '../communication/methods.js';
+import { RPC_CALLS } from '../eth/constants.js';
 import {
   Communicator,
-  SafeInfo,
   ChainInfo,
   SafeBalances,
   GetBalanceParams,
@@ -14,8 +13,9 @@ import {
   AddressBookItem,
   isObjectEIP712TypedData,
   EIP712TypedData,
-} from '../types';
-import requirePermission from '../decorators/requirePermissions';
+  SafeInfoExtended,
+} from '../types/index.js';
+import requirePermission from '../decorators/requirePermissions.js';
 
 class Safe {
   private readonly communicator: Communicator;
@@ -33,8 +33,8 @@ class Safe {
     return response.data;
   }
 
-  async getInfo(): Promise<SafeInfo> {
-    const response = await this.communicator.send<Methods.getSafeInfo, undefined, SafeInfo>(
+  async getInfo(): Promise<SafeInfoExtended> {
+    const response = await this.communicator.send<Methods.getSafeInfo, undefined, SafeInfoExtended>(
       Methods.getSafeInfo,
       undefined,
     );
@@ -57,10 +57,35 @@ class Safe {
   private async check1271Signature(messageHash: string, signature = '0x'): Promise<boolean> {
     const safeInfo = await this.getInfo();
 
-    const encodedIsValidSignatureCall = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
-      messageHash,
-      signature,
-    ]);
+    const encodedIsValidSignatureCall = encodeFunctionData({
+      abi: [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: '_dataHash',
+              type: 'bytes32',
+            },
+            {
+              name: '_signature',
+              type: 'bytes',
+            },
+          ],
+          name: 'isValidSignature',
+          outputs: [
+            {
+              name: '',
+              type: 'bytes4',
+            },
+          ],
+          payable: false,
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ] as const,
+      functionName: 'isValidSignature',
+      args: [messageHash as Address, signature as Address],
+    });
 
     const payload = {
       call: RPC_CALLS.eth_call,
@@ -86,12 +111,36 @@ class Safe {
 
   private async check1271SignatureBytes(messageHash: string, signature = '0x'): Promise<boolean> {
     const safeInfo = await this.getInfo();
-    const msgBytes = ethers.utils.arrayify(messageHash);
 
-    const encodedIsValidSignatureCall = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
-      msgBytes,
-      signature,
-    ]);
+    const encodedIsValidSignatureCall = encodeFunctionData({
+      abi: [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: '_data',
+              type: 'bytes',
+            },
+            {
+              name: '_signature',
+              type: 'bytes',
+            },
+          ],
+          name: 'isValidSignature',
+          outputs: [
+            {
+              name: '',
+              type: 'bytes4',
+            },
+          ],
+          payable: false,
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ] as const,
+      functionName: 'isValidSignature',
+      args: [messageHash as Address, signature as Address],
+    });
 
     const payload = {
       call: RPC_CALLS.eth_call,
@@ -117,11 +166,46 @@ class Safe {
   }
 
   calculateMessageHash(message: string): string {
-    return ethers.utils.hashMessage(message);
+    return hashMessage(message);
   }
 
   calculateTypedMessageHash(typedMessage: EIP712TypedData): string {
-    return ethers.utils._TypedDataEncoder.hash(typedMessage.domain, typedMessage.types, typedMessage.message);
+    const chainId =
+      typeof typedMessage.domain.chainId === 'object'
+        ? typedMessage.domain.chainId.toNumber()
+        : Number(typedMessage.domain.chainId);
+
+    let primaryType = typedMessage.primaryType;
+    if (!primaryType) {
+      const fields = Object.values(typedMessage.types);
+      // We try to infer primaryType (simplified ether's version)
+      const primaryTypes = Object.keys(typedMessage.types).filter((typeName) =>
+        fields.every((dataTypes) => dataTypes.every(({ type }) => type.replace('[', '').replace(']', '') !== typeName)),
+      );
+      if (primaryTypes.length === 0 || primaryTypes.length > 1) throw new Error('Please specify primaryType');
+      primaryType = primaryTypes[0];
+    }
+
+    return hashTypedData({
+      message: typedMessage.message,
+      domain: {
+        ...typedMessage.domain,
+        chainId,
+        verifyingContract: typedMessage.domain.verifyingContract as Address,
+        salt: typedMessage.domain.salt as Address,
+      },
+      types: typedMessage.types,
+      primaryType,
+    });
+  }
+
+  async getOffChainSignature(messageHash: string): Promise<string> {
+    const response = await this.communicator.send<Methods.getOffChainSignature, string, string>(
+      Methods.getOffChainSignature,
+      messageHash,
+    );
+
+    return response.data;
   }
 
   async isMessageSigned(message: string | EIP712TypedData, signature = '0x'): Promise<boolean> {

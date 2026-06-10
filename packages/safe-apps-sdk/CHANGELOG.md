@@ -1,4 +1,74 @@
-# @gnosis.pm/safe-apps-sdk
+# @safe-global/safe-apps-sdk
+
+## 9.1.0
+
+### Minor Changes
+
+- e0710be: safe.getInfo() endpoint should return extended safe information similar to api-kit's getSafeInfo endpoint
+
+### Patch Changes
+
+- 55342f0: chore: bump dependencies
+- 2cc8919: upgraded viem and wagmi to v2
+
+## 9.0.0
+
+### Major Changes
+
+- 9fb93b1: Added ESM version of SDK to improve tree shaking
+
+### Patch Changes
+
+- 767e262: Export RPC_CALLS as an object
+
+## 9.0.0-next.1
+
+### Patch Changes
+
+- 767e262: Export RPC_CALLS as an object
+
+## 9.0.0-next.0
+
+### Major Changes
+
+- 9fb93b1: Added ESM version of SDK to improve tree shaking
+
+## 8.1.0
+
+### Minor Changes
+
+- 077d2cc: Add sideEffects false to package.json to improve tree-shaking
+- b24cde9: chore: bump dependencies
+
+## 8.0.0
+
+### Major Changes
+
+- dfb7fae: Optimized SDK bundle size by ~100kb
+
+## 7.11.0
+
+### Minor Changes
+
+- bdae5af: Signing methods return the signature instead of `0x`
+
+## 7.10.1
+
+### Patch Changes
+
+- d759219: Fix getSDKVersion
+
+## 7.10.0
+
+### Minor Changes
+
+- f89c36f: Adds the new `setSafeSettings` and `getOffChainSignature` methods.
+
+## 7.9.0
+
+### Minor Changes
+
+- 6bdd4f9: Update `safe-gateway-typescript-sdk` from gnosis.pm to safe-global
 
 ## 7.8.0
 

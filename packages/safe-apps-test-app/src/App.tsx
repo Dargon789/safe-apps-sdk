@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Spinner, Heading, SegmentedControl } from 'evergreen-ui';
-import SafeAppsSDK, { SafeInfo } from '@gnosis.pm/safe-apps-sdk';
+import SafeAppsSDK, { SafeInfo } from '@safe-global/safe-apps-sdk';
 import { AppTabs } from './types';
 import Main from './tabs/Main';
 import RpcCalls from './tabs/RpcCalls';
@@ -42,15 +42,16 @@ const App = (): React.ReactElement => {
       });
 
     async function loadSafeInfo() {
-      const safuInfo = await SDK.safe.getInfo()
-      const chainInfo = await SDK.safe.getChainInfo()
-      console.log({ safuInfo, chainInfo })
-      setSafeInfo(safuInfo)
+      const safeInfo = await SDK.safe.getInfo();
+      const chainInfo = await SDK.safe.getChainInfo();
+      console.log({ safeInfo, chainInfo });
+      setSafeInfo(safeInfo);
     }
     loadSafeInfo();
   }, []);
 
   const [currentTab, setCurrentTab] = useState<string>('0');
+  const [offChainSigningEnabled, setOffChainSigningEnabled] = useState(false);
 
   if (!safeInfo) {
     return <Spinner size={24} />;
@@ -59,16 +60,12 @@ const App = (): React.ReactElement => {
   return (
     <Container>
       <Heading size={700} marginTop="default">
-        Gnosis Safe Test App
+        Safe Test App
       </Heading>
-      <SegmentedControl
-        value={currentTab}
-        onChange={(val) => setCurrentTab(val as AppTabs)}
-        options={tabs}
-      />
+      <SegmentedControl value={currentTab} onChange={(val) => setCurrentTab(val as AppTabs)} options={tabs} />
 
-      {currentTab === '0' && <Main sdk={SDK} safeInfo={safeInfo} />}
-      {currentTab === '1' && <RpcCalls sdk={SDK} />}
+      {currentTab === '0' && <Main sdk={SDK} safeInfo={safeInfo} offChainSigningEnabled={offChainSigningEnabled} />}
+      {currentTab === '1' && <RpcCalls sdk={SDK} setOffChainSigning={setOffChainSigningEnabled} />}
     </Container>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import SdkInstance from '@gnosis.pm/safe-apps-sdk';
+import SdkInstance from '@safe-global/safe-apps-sdk';
 import GetBalance from './GetBalance';
 import GetCode from './GetCode';
 import GetStorageAt from './GetStorageAt';
@@ -12,15 +12,16 @@ import GetTransactionByHash from './GetTransactionByHash';
 import GetPermissions from './GetPermissions';
 import RequestAddressBook from './RequestAddressBook';
 import RequestPermissions from './RequestPermissions';
-import UseOffChainSignatures from './UseOffChainSignatures';
+import SafeSettings from './SafeSettings';
 
 type OwnProps = {
   sdk: SdkInstance;
+  setOffChainSigning: (offChainEnabled: boolean) => void;
 };
 
-const RpcCalls = ({ sdk }: OwnProps) => (
+const RpcCalls = ({ sdk, setOffChainSigning }: OwnProps) => (
   <div>
-    <UseOffChainSignatures sdk={sdk} />
+    <SafeSettings sdk={sdk} setOffChainSigning={setOffChainSigning} />
     <hr />
     <GetPermissions sdk={sdk} />
     <hr />

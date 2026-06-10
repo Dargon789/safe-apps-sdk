@@ -3,7 +3,7 @@
 We prepared a create-react-app template that allows you to get a basic skeleton for the app. It includes React, Typescript, ESLint, Prettier, Material UI, and styled-components. To use it, run this command in your terminal:
 
 ```
-npx create-react-app drain-safe --template @gnosis.pm/cra-template-safe-app
+npx create-react-app drain-safe --template @safe-global/cra-template-safe-app
 cd drain-safe
 ```
 
@@ -28,8 +28,6 @@ drain-safe
 ├── src
 │   ├── App.test.tsx
 │   ├── App.tsx
-│   ├── GlobalStyle.ts
-│   ├── fonts.d.ts
 │   ├── index.tsx
 │   ├── react-app-env.d.ts
 │   ├── setupProxy.js
@@ -44,7 +42,7 @@ Above is a typical React application structure, so everything should be familiar
 
 # Load the app inside the Safe interface
 
-You can access our testnet deployment at https://rinkeby.gnosis-safe.io/. If you need rinkeby ETH, you can get it at https://faucet.rinkeby.io/.
+You can load a Safe on any of the testnets available at https://app.safe.global.
 
 First, you need a Safe. Just follow the steps on the welcome page to create one. As soon as it's created, it should take you to a Safe overview page. Next, you need to click on the "Apps" entry in the sidebar on the left.
 
@@ -62,7 +60,7 @@ Click "add", and it should open the app. You'll also find it in the app list fro
 
 If it doesn't load, double-check that your manifest.json file is accessible.
 
-**Tip**: If you want to test your app with some specific safe, you can open the Safe page directly or follow the steps to load it. For example, you can load https://gnosis-safe.io/app/#/safes/0x292BACF82268e143F5195aF6928693699E31F911/balances, and access your app within the Safe page. With read-only access, you are able to access apps via different safes. While you can't send any transactions, you can verify that you assembled the transaction correctly if the transaction modal appears.
+**Tip**: If you want to test your app with some specific safe, you can open the Safe page directly or follow the steps to load it. For example, you can load https://app.safe.global/eth:0xfF501B324DC6d78dC9F983f140B9211c3EdB4dc7/home, and access your app within the Safe page. With read-only access, you are able to access apps via different safes. While you can't send any transactions, you can verify that you assembled the transaction correctly if the transaction modal appears.
 
 The app should display a button that sends an empty transaction. Click on it and send the transaction to get the feeling of it.
 
@@ -70,25 +68,23 @@ The app should display a button that sends an empty transaction. Click on it and
 
 # Adding necessary building blocks to the app
 
-You need few dependencies for the app:
+You need extra dependencies for the app:
 
-- library for generating a transaction (web3-eth-abi)
-- library for dealing with large numbers (bignumber.js)
-- library with general purpose web3 utilities (web3-utils)
+- library with general purpose web3 utilities (viem)
 
 Install them by running this command:
 
 ```
-npm i web3-eth-abi bignumber.js web3-utils
+npm i viem
 ```
 
 You also need an ABI for ERC20 token contracts. Create a file `src/abis/erc20.ts`:
 
 ```ts
-import { AbiItem } from 'web3-utils';
+import { Abi } from 'viem'
 
-const ERC_20_ABI: { [key: string]: AbiItem } = {
-  transfer: {
+const ERC_20_ABI: Abi = [
+  {
     constant: false,
     inputs: [
       {
@@ -111,9 +107,9 @@ const ERC_20_ABI: { [key: string]: AbiItem } = {
     stateMutability: 'nonpayable',
     type: 'function',
   },
-};
+]
 
-export { ERC_20_ABI };
+export { ERC_20_ABI }
 ```
 
 In the next section you'll learn how to fetch and display assets owned by the Safe - [Display Safe Assets](/guides/drain-safe-app/02-display-safe-assets.md).

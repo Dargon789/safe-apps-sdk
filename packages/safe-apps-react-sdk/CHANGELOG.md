@@ -1,4 +1,77 @@
-# @gnosis.pm/safe-apps-react-sdk
+# @safe-global/safe-apps-react-sdk
+
+## 4.7.2
+
+### Patch Changes
+
+- 55342f0: chore: bump dependencies
+- Updated dependencies [e0710be]
+- Updated dependencies [55342f0]
+- Updated dependencies [2cc8919]
+  - @safe-global/safe-apps-sdk@9.1.0
+
+## 4.7.1
+
+### Patch Changes
+
+- Updated dependencies [767e262]
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0
+
+## 4.7.1-next.0
+
+### Patch Changes
+
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0-next.0
+
+## 4.7.0
+
+### Minor Changes
+
+- 077d2cc: Add sideEffects false to package.json to improve tree-shaking
+- b24cde9: chore: bump dependencies
+
+### Patch Changes
+
+- Updated dependencies [077d2cc]
+- Updated dependencies [b24cde9]
+  - @safe-global/safe-apps-sdk@8.1.0
+
+## 4.6.7
+
+### Patch Changes
+
+- Updated dependencies [dfb7fae]
+  - @safe-global/safe-apps-sdk@8.0.0
+
+## 4.6.6
+
+### Patch Changes
+
+- Updated dependencies [bdae5af]
+  - @safe-global/safe-apps-sdk@7.11.0
+
+## 4.6.5
+
+### Patch Changes
+
+- Updated dependencies [d759219]
+  - @safe-global/safe-apps-sdk@7.10.1
+
+## 4.6.4
+
+### Patch Changes
+
+- Updated dependencies [f89c36f]
+  - @safe-global/safe-apps-sdk@7.10.0
+
+## 4.6.3
+
+### Patch Changes
+
+- Updated dependencies [6bdd4f9]
+  - @safe-global/safe-apps-sdk@7.9.0
 
 ## 4.6.2
 

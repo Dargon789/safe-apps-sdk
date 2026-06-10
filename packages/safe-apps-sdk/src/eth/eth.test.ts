@@ -1,6 +1,6 @@
-import SDK from '../index';
-import { Methods } from '../communication';
-import { PastLogsOptions, PostMessageOptions, TransactionConfig } from '../types';
+import SDK from '../index.js';
+import { Methods } from '../communication/index.js';
+import { PastLogsOptions, PostMessageOptions, TransactionConfig } from '../types/index.js';
 
 describe('Safe Apps SDK Read RPC Requests', () => {
   const sdkInstance = new SDK({ allowedDomains: [/http:\/\/localhost:3000/] });
@@ -345,6 +345,27 @@ describe('Safe Apps SDK Read RPC Requests', () => {
           params: {
             call: 'eth_gasPrice',
             params: [],
+          },
+        }),
+        '*',
+      );
+    });
+  });
+
+  describe('setSafeSettings', () => {
+    it('Should send valid, Safe-specific settings to the interface', () => {
+      sdkInstance.eth.setSafeSettings([
+        {
+          offChainSigning: true,
+        },
+      ]);
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: Methods.rpcCall,
+          params: {
+            call: 'safe_setSettings',
+            params: [{ offChainSigning: true }],
           },
         }),
         '*',

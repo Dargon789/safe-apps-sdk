@@ -1,4 +1,122 @@
-# @gnosis.pm/safe-apps-provider
+# @safe-global/safe-apps-provider
+
+## 0.18.6
+
+### Patch Changes
+
+- 8036c19: Update EIP-5792 according to spec.
+- 2081b24: Update EIP-5792 implementation according to spec. and fix pending status
+
+## 0.18.5
+
+### Patch Changes
+
+- 5219a05: Update EIP-5792 implementation according to spec. and fix pending status
+
+## 0.18.4
+
+### Patch Changes
+
+- 21ffde5: Add EIP-5792 support
+
+## 0.18.3
+
+### Patch Changes
+
+- 55342f0: chore: bump dependencies
+- Updated dependencies [e0710be]
+- Updated dependencies [55342f0]
+- Updated dependencies [2cc8919]
+  - @safe-global/safe-apps-sdk@9.1.0
+
+## 0.18.2
+
+### Patch Changes
+
+- Updated dependencies [767e262]
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0
+
+## 0.18.2-next.0
+
+### Patch Changes
+
+- Updated dependencies [9fb93b1]
+  - @safe-global/safe-apps-sdk@9.0.0-next.0
+
+## 0.18.1
+
+### Patch Changes
+
+- d6baa64: fallback `value` and `data` were overwritten with `undefined`
+
+## 0.18.0
+
+### Minor Changes
+
+- 077d2cc: Add sideEffects false to package.json to improve tree-shaking
+- b24cde9: chore: bump dependencies
+
+### Patch Changes
+
+- Updated dependencies [077d2cc]
+- Updated dependencies [b24cde9]
+  - @safe-global/safe-apps-sdk@8.1.0
+
+## 0.17.1
+
+### Patch Changes
+
+- Updated dependencies [dfb7fae]
+  - @safe-global/safe-apps-sdk@8.0.0
+
+## 0.17.0
+
+### Minor Changes
+
+- bdae5af: Signing methods return the signature instead of `0x`
+
+### Patch Changes
+
+- Updated dependencies [bdae5af]
+  - @safe-global/safe-apps-sdk@7.11.0
+
+## 0.16.1
+
+### Patch Changes
+
+- Updated dependencies [d759219]
+  - @safe-global/safe-apps-sdk@7.10.1
+
+## 0.16.0
+
+### Minor Changes
+
+- f89c36f: Adds the new `setSafeSettings` and `getOffChainSignature` methods.
+
+### Patch Changes
+
+- Updated dependencies [f89c36f]
+  - @safe-global/safe-apps-sdk@7.10.0
+
+## 0.15.2
+
+### Patch Changes
+
+- Updated dependencies [6bdd4f9]
+  - @safe-global/safe-apps-sdk@7.9.0
+
+## 0.15.1
+
+### Patch Changes
+
+- b6c00b8: Convert gaslimit hex-encoded string to a decimal number
+
+## 0.15.0
+
+### Minor Changes
+
+- 6762218: Pass the gas limit to `safeTxGas` when sending a transaction through the Safe app provider
 
 ## 0.14.0
 

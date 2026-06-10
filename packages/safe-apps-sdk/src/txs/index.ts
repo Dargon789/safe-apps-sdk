@@ -1,4 +1,4 @@
-import { Methods } from '../communication/methods';
+import { Methods } from '../communication/methods.js';
 import {
   GatewayTransactionDetails,
   SignMessageParams,
@@ -9,7 +9,8 @@ import {
   SignTypedMessageParams,
   EIP712TypedData,
   isObjectEIP712TypedData,
-} from '../types';
+  SignMessageResponse,
+} from '../types/index.js';
 
 class TXs {
   private readonly communicator: Communicator;
@@ -32,12 +33,12 @@ class TXs {
     return response.data;
   }
 
-  async signMessage(message: string): Promise<SendTransactionsResponse> {
+  async signMessage(message: string): Promise<SignMessageResponse> {
     const messagePayload = {
       message,
     };
 
-    const response = await this.communicator.send<Methods.signMessage, SignMessageParams, SendTransactionsResponse>(
+    const response = await this.communicator.send<Methods.signMessage, SignMessageParams, SignMessageResponse>(
       Methods.signMessage,
       messagePayload,
     );
@@ -45,7 +46,7 @@ class TXs {
     return response.data;
   }
 
-  async signTypedMessage(typedData: EIP712TypedData): Promise<SendTransactionsResponse> {
+  async signTypedMessage(typedData: EIP712TypedData): Promise<SignMessageResponse> {
     if (!isObjectEIP712TypedData(typedData)) {
       throw new Error('Invalid typed data');
     }
@@ -53,7 +54,7 @@ class TXs {
     const response = await this.communicator.send<
       Methods.signTypedMessage,
       SignTypedMessageParams,
-      SendTransactionsResponse
+      SignMessageResponse
     >(Methods.signTypedMessage, { typedData });
 
     return response.data;

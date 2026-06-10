@@ -1,19 +1,42 @@
-import { useAccount, useConnect, useDisconnect, usePrepareSendTransaction, useSendTransaction } from 'wagmi';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useEstimateGas,
+  useSendTransaction,
+  useSimulateContract,
+  useWriteContract,
+} from 'wagmi';
 
 import { useAutoConnect } from '../useAutoConnect';
 
 export function Connect() {
-  const { connect, connectors, error, pendingConnector } = useConnect();
+  const { connect, connectors, error } = useConnect();
   const { isConnecting, connector: activeConnector } = useAccount();
   const { disconnect } = useDisconnect();
-  const { config } = usePrepareSendTransaction({
-    request: {
-      to: 'awkweb.eth',
-      value: '10000000000000000', // 0.01 ETH
-    },
+  const { data: txGasEstimate } = useEstimateGas({
+    to: '0x000000000000000000000000000000000000beef',
+    value: BigInt('0'),
   });
 
-  const { sendTransactionAsync } = useSendTransaction(config);
+  const { sendTransactionAsync } = useSendTransaction();
+
+  const { data } = useSimulateContract({
+    // wagmi mint example contract
+    address: '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2',
+    abi: [
+      {
+        name: 'mint',
+        type: 'function',
+        stateMutability: 'nonpayable',
+        inputs: [],
+        outputs: [],
+      },
+    ],
+    functionName: 'mint',
+  });
+
+  const { writeContract } = useWriteContract();
 
   useAutoConnect();
 
@@ -23,16 +46,29 @@ export function Connect() {
         {activeConnector && (
           <>
             <button onClick={() => disconnect()}>Disconnect from {activeConnector.name}</button>
-            <button onClick={() => sendTransactionAsync?.()}>Test transaction</button>
+            <button onClick={() => writeContract(data!.request)}>
+              Test WagmiMintExample write contract transaction
+            </button>
+            <button
+              onClick={() =>
+                sendTransactionAsync?.({
+                  gas: txGasEstimate,
+                  to: '0x000000000000000000000000000000000000beef',
+                  value: BigInt('0'),
+                })
+              }
+            >
+              Test send transaction
+            </button>
           </>
         )}
 
         {connectors
-          .filter((x) => x.ready && x.id !== activeConnector?.id)
+          .filter((x) => x.id !== activeConnector?.id)
           .map((x) => (
             <button key={x.id} onClick={() => connect({ connector: x })}>
               {x.name}
-              {isConnecting && x.id === pendingConnector?.id && ' (connecting)'}
+              {isConnecting && ' (connecting)'}
             </button>
           ))}
       </div>

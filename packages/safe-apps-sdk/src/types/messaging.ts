@@ -1,7 +1,14 @@
-import { Methods } from '../communication/methods';
-import { SafeInfo, ChainInfo, SendTransactionsResponse, EnvironmentInfo, AddressBookItem } from './sdk';
-import { GatewayTransactionDetails, SafeBalances } from './gateway';
-import { Permission } from './permissions';
+import { Methods } from '../communication/methods.js';
+import {
+  SafeInfo,
+  ChainInfo,
+  SendTransactionsResponse,
+  EnvironmentInfo,
+  AddressBookItem,
+  SignMessageResponse,
+} from './sdk.js';
+import { GatewayTransactionDetails, SafeBalances } from './gateway.js';
+import { Permission } from './permissions.js';
 
 export type RequestId = string;
 
@@ -14,9 +21,10 @@ export interface MethodToResponse {
   [Methods.getChainInfo]: ChainInfo;
   [Methods.getTxBySafeTxHash]: GatewayTransactionDetails;
   [Methods.getSafeBalances]: SafeBalances[];
-  [Methods.signMessage]: SendTransactionsResponse;
-  [Methods.signTypedMessage]: SendTransactionsResponse;
+  [Methods.signMessage]: SignMessageResponse;
+  [Methods.signTypedMessage]: SignMessageResponse;
   [Methods.getEnvironmentInfo]: EnvironmentInfo;
+  [Methods.getOffChainSignature]: string;
   [Methods.requestAddressBook]: AddressBookItem[];
   [Methods.wallet_getPermissions]: Permission[];
   [Methods.wallet_requestPermissions]: Permission[];

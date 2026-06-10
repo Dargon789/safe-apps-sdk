@@ -1,19 +1,17 @@
 # Safe Apps SDK
 
-[![Logo](https://raw.githubusercontent.com/gnosis/safe-apps-sdk/master/assets/logo.png)](https://gnosis-safe.io)
-[![npm](https://img.shields.io/npm/v/@gnosis.pm/safe-apps-sdk)](https://www.npmjs.com/package/@gnosis.pm/safe-apps-sdk)
-[![Build Status](https://travis-ci.org/gnosis/safe-apps-sdk.svg?branch=master)](https://travis-ci.org/gnosis/pm-contracts)
+[![npm](https://img.shields.io/npm/v/@safe-global/safe-apps-sdk)](https://www.npmjs.com/package/@safe-global/safe-apps-sdk)
 
-Software development kit to integrate third-party applications (Safe Apps) with Safe (https://gnosis-safe.io/app/).
+Software development kit to integrate third-party applications (Safe Apps) with Safe (https://app.safe.global/).
 
 ## Install
 
 ### Install the package with yarn or npm:
 
 ```bash
-yarn add @gnosis.pm/safe-apps-sdk
+yarn add @safe-global/safe-apps-sdk
 
-npm install @gnosis.pm/safe-apps-sdk
+npm install @safe-global/safe-apps-sdk
 ```
 
 ## Build
@@ -43,12 +41,12 @@ And for Linux:
 
 Apps built with the Safe Apps SDK are meant to be run in an iframe inside the Safe Web UI.
 This library exposes a class as a default export. It accepts an optional options object:  
-`allowedDomains` - Array of regular expressions for origins to accept messages from. If not passed, accepts 
+`allowedDomains` - Array of regular expressions for origins to accept messages from. If not passed, accepts
 messages from all domains  
 `debug` - Boolean. If enabled, it will log outgoing/incoming messages.
 
 ```ts
-import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk';
+import SafeAppsSDK from '@safe-global/safe-apps-sdk';
 
 type Opts = {
   allowedDomains?: RegExp[];
@@ -56,8 +54,8 @@ type Opts = {
 };
 
 const opts: Opts = {
-  allowedDomains: [/gnosis-safe.io/],
-  debug: false
+  allowedDomains: [/^https:\/\/app\.safe\.global$/],
+  debug: false,
 };
 
 const appsSdk = new SafeAppsSDK(opts);
@@ -141,7 +139,7 @@ Sending a TX through the Safe is as simple as invoking `.txs.send()`
 
 ```js
 // Create a web3 instance
-const web3 = new Web3('https://rinkeby.infura.io/v3/token');
+const web3 = new Web3('https://sepolia.infura.io/v3/{YOUR_API_KEY}');
 const contract = new web3.eth.Contract(abi, contractAddress);
 
 const txs = [
@@ -173,7 +171,47 @@ try {
 
 ### Signing messages
 
-Because the Safe is a smart contract wallet, it doesn't have a private key that the wallet can use to sign messages. Instead, we have a library to sign messages, and the validation logic follows [EIP-1271 - Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271). Signing a message with the Safe requires sending a Safe transaction that needs to be approved by Safe owners. To dive into the smart contract implementation, you can start with [library tests](https://github.com/gnosis/safe-contracts/blob/main/test/libraries/SignMessageLib.spec.ts) in the safe-contracts repo.
+#### Off-chain signing
+
+Signing a message off-chain first requires dispatching a `safe_setSettings` RPC call (via `sdk.eth.setSafeSettings()`) with the `offChainSigning` flag set to `true`. Then the relevant `signMessage`/`signTypedData` needs to be called, proposing a message to our services that can then be approved by Safe owners.
+
+```js
+const settings = {
+  offChainSigning: true,
+};
+
+const currentSettings = await appsSdk.eth.setSafeSettings([settings]);
+
+const message = "I'm the owner of wallet 0x000000";
+const hash = await sdk.txs.signMessage(message);
+// { messageHash: '0x...' }
+
+const typedMessage = {
+    ...
+}
+const hash = await sdk.txs.signTypedMessage(typedMessage);
+// { messageHash: '0x...' }
+```
+
+Signing returns the `messageHash` of the proposed [`SafeMessage`](https://github.com/safe-global/safe-contracts/blob/main/contracts/handler/CompatibilityFallbackHandler.sol#L12) which can be used to fetch the off-chain signature with.
+
+```js
+const offChainSignature = await sdk.safe.getOffChainSignature(messageHash);
+// '0x123'
+```
+
+The returned signature will either be an empty string or valid one once the required number of Safe owners have confirmed the message.
+
+To validate the signature, use `sdk.safe.isMessageSigned()`, passing the signature as the second argument.
+
+```js
+const message = "I'm the owner of wallet 0x000000";
+const messageIsSigned = await sdk.safe.isMessageSigned(message, signature);
+```
+
+#### On-chain signing
+
+Because the Safe is a smart contract wallet, it doesn't have a private key that the wallet can use to sign messages. Instead, we have a library to sign messages, and the validation logic follows [EIP-1271 - Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271). Signing a message with the Safe requires sending a Safe transaction that needs to be approved by Safe owners. To dive into the smart contract implementation, you can start with [library tests](https://github.com/safe-global/safe-contracts/blob/ee92957307653ae6cf7312bbcb1a13c6884ea6ea/test/libraries/SignMessageLib.spec.ts) in the safe-contracts repo.
 
 To trigger the transaction to sign a message, you can use `sdk.txs.signMessage()` or `sdk.txs.signTypedMessage()`.
 
@@ -417,6 +455,20 @@ const tx = await appsSdk.eth.getTransactionReceipt([
 ]);
 ```
 
+### setSafeSettings
+
+Sets settings of the currently opened Safe.
+
+> Note: Returns the new `SafeSettings`.
+
+```js
+const settings = {
+  offChainSigning: true,
+};
+
+const success = await appsSdk.eth.setSafeSettings([settings]);
+```
+
 ## Testing in the Safe application
 
 ### Manifest
@@ -515,18 +567,18 @@ As in most cases the SSL certificate provided by `react-scripts` is not valid it
 
 ### Loading the Safe App
 
-While developing your Safe App you can directly use [our production interface](https://gnosis-safe.io/app) for testing it. Some testnets like Rinkeby are also available there.
+While developing your Safe App you can directly use [our production interface](https://app.safe.global) for testing it. Some testnets like Sepolia are also available there.
 Once your app is live, even if you are running it locally, you can import it to the Safe application as a custom app. To do so, you should select the "Apps" tab:
 
 ![Apps section button][safeappstab]
 
-[safeappstab]: https://raw.githubusercontent.com/gnosis/safe-apps-sdk/master/assets/safe-tab-apps.png 'Safe: Apps tab'
+[safeappstab]: https://raw.githubusercontent.com/safe-global/safe-apps-sdk/main/assets/safe-tab-apps.png 'Safe: Apps tab'
 
 Use the `Add custom app` button and add your app using a link:
 
 ![Add custom Safe App form][safeaddapp]
 
-[safeaddapp]: https://raw.githubusercontent.com/gnosis/safe-apps-sdk/master/assets/third-pary-app-modal.png 'Safe: Add Safe App'
+[safeaddapp]: https://raw.githubusercontent.com/safe-global/safe-apps-sdk/main/assets/third-party-app-modal.png 'Safe: Add Safe App'
 
 ## Deploy to IPFS
 
@@ -539,9 +591,9 @@ ipfs add -r build
 
 ## Examples of applications built with this SDK
 
-- https://github.com/gnosis/safe-react-apps
+- https://github.com/safe-global/safe-react-apps
 - https://github.com/Uxio0/safe-react-collectibles
-- https://docs.gnosis-safe.io/build/sdks/safe-apps#existing-safe-apps
+- https://docs.safe.global/safe-core-aa-sdk/safe-apps#existing-safe-apps
 
 ## License
 
