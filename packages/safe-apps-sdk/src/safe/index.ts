@@ -265,6 +265,28 @@ class Safe {
 
     return response.data;
   }
+
+  async useOffChainSignatures(shouldActivate: boolean): Promise<boolean> {
+    try {
+      const payload = {
+        call: RPC_CALLS.safe_useOffChainSignatures,
+        params: [
+          {
+            data: shouldActivate,
+          },
+          'latest',
+        ],
+      };
+
+      const response = await this.communicator.send<Methods.rpcCall, RPCPayload<[boolean]>, boolean>(
+        Methods.rpcCall,
+        payload,
+      );
+      return response.data;
+    } catch (err) {
+      return false;
+    }
+  }
 }
 
 export { Safe };
