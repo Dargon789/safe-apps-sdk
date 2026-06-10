@@ -1,0 +1,13 @@
+{
+  "mode": "exit",
+  "tag": "next",
+  "initialVersions": {
+    "@safe-global/cra-template-safe-app": "5.0.0",
+    "@safe-global/safe-apps-provider": "0.18.3",
+    "@safe-global/safe-apps-react-sdk": "4.7.2",
+    "@safe-global/safe-apps-sdk": "9.1.0",
+    "@safe-global/safe-apps-test-app": "0.2.1",
+    "@safe-global/safe-apps-web3modal": "23.0.0"
+  },
+  "changesets": []
+}

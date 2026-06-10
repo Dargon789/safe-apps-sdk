@@ -34,7 +34,7 @@ class PostMessageCommunicator implements Communicator {
   };
 
   private logIncomingMessage = (msg: InterfaceMessageEvent): void => {
-    console.info(`Safe Apps SDK v1: A message was received from origin ${msg.origin}. `, msg.data);
+    console.info('Safe Apps SDK v1: A message was received from origin %s.', msg.origin, msg.data);
   };
 
   private onParentMessage = (msg: InterfaceMessageEvent): void => {
@@ -48,10 +48,11 @@ class PostMessageCommunicator implements Communicator {
     const { id } = payload;
 
     const cb = this.callbacks.get(id);
-    if (cb) {
+    if (typeof cb === 'function') {
       cb(payload);
-
       this.callbacks.delete(id);
+    } else {
+      console.error(`Callback for id ${id} is not a function or does not exist.`);
     }
   };
 
