@@ -196,7 +196,11 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
         return this.sdk.eth.setSafeSettings([params[0]]);
 
       case 'wallet_sendCalls': {
-        const { from, calls, chainId }: SendCallsParams = params[0];
+        const params0 = params[0];
+        if (!params0 || !Array.isArray(params0.calls)) {
+          throw new Error('Invalid parameters: "calls" must be an array');
+        }
+        const { from, calls, chainId }: SendCallsParams = params0;
 
         if (chainId !== numberToHex(this.chainId)) {
           throw new Error(`Safe is not on chain ${chainId}`);
