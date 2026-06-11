@@ -273,14 +273,14 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
         const blockNumber = Number(receipt.blockNumber);
         const gasUsed = Number(receipt.gasUsed);
 
-        result.receipts = Array(calls).fill({
+        result.receipts = Array.from({ length: calls }, () => ({
           logs: receipt.logs,
           status: numberToHex(tx.txStatus === TransactionStatus.SUCCESS ? 1 : 0),
           blockHash: receipt.blockHash,
           blockNumber: numberToHex(blockNumber),
           gasUsed: numberToHex(gasUsed),
           transactionHash: tx.txHash,
-        });
+        }));
 
         return result;
       }
