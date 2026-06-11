@@ -267,7 +267,7 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
           tx.txData?.dataDecoded?.method !== 'multiSend'
             ? 1
             : // Number of batched transactions
-              tx.txData.dataDecoded.parameters?.[0].valueDecoded?.length ?? 1;
+              tx.txData?.dataDecoded?.parameters?.[0].valueDecoded?.length ?? 1;
 
         // Typed as number; is hex
         const blockNumber = Number(receipt.blockNumber);
