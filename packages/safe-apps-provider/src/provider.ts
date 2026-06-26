@@ -1,7 +1,7 @@
-import SafeAppsSDK, { SafeInfo, Web3TransactionObject } from '@safe-global/safe-apps-sdk';
+import SafeAppsSDK, { SafeInfo, TransactionStatus, Web3TransactionObject } from '@safe-global/safe-apps-sdk';
 import { EventEmitter } from 'events';
-import { EIP1193Provider } from './types';
-import { getLowerCase } from './utils';
+import { EIP1193Provider, GetCallsParams, GetCallsResult, SendCallsParams, SendCallsResult } from './types';
+import { getLowerCase, numberToHex } from './utils';
 
 // The API is based on Ethereum JavaScript API Provider Standard. Link: https://eips.ethereum.org/EIPS/eip-1193
 export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
@@ -38,7 +38,7 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
 
       case 'net_version':
       case 'eth_chainId':
-        return `0x${this.chainId.toString(16)}`;
+        return numberToHex(this.chainId);
 
       case 'personal_sign': {
         const [message, address] = params;
@@ -194,6 +194,107 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
 
       case 'safe_setSettings':
         return this.sdk.eth.setSafeSettings([params[0]]);
+
+      case 'wallet_sendCalls': {
+        const { from, calls, chainId }: SendCallsParams = params[0];
+
+        if (chainId !== numberToHex(this.chainId)) {
+          throw new Error(`Safe is not on chain ${chainId}`);
+        }
+
+        if (from !== this.safe.safeAddress) {
+          throw Error('Invalid from address');
+        }
+
+        const txs = calls.map((call, i) => {
+          if (!call.to) {
+            throw new Error(`Invalid call #${i}: missing "to" field`);
+          }
+          return {
+            to: call.to,
+            data: call.data ?? '0x',
+            value: call.value ?? numberToHex(0),
+          };
+        });
+
+        const { safeTxHash } = await this.sdk.txs.send({ txs });
+
+        const result: SendCallsResult = {
+          id: safeTxHash,
+        };
+
+        return result;
+      }
+
+      case 'wallet_getCallsStatus': {
+        const safeTxHash: GetCallsParams = params[0];
+
+        const CallStatus: {
+          [key in TransactionStatus]: GetCallsResult['status'];
+        } = {
+          [TransactionStatus.AWAITING_CONFIRMATIONS]: 100,
+          [TransactionStatus.AWAITING_EXECUTION]: 100,
+          [TransactionStatus.SUCCESS]: 200,
+          [TransactionStatus.CANCELLED]: 400,
+          [TransactionStatus.FAILED]: 500,
+        };
+
+        const tx = await this.sdk.txs.getBySafeTxHash(safeTxHash);
+
+        const result: GetCallsResult = {
+          version: '1.0',
+          id: safeTxHash,
+          chainId: numberToHex(this.chainId),
+          status: CallStatus[tx.txStatus],
+        };
+
+        // Transaction is queued
+        if (!tx.txHash) {
+          return result;
+        }
+
+        // If transaction is executing, receipt is null
+        const receipt = await this.sdk.eth.getTransactionReceipt([tx.txHash]);
+        if (!receipt) {
+          return result;
+        }
+
+        const calls =
+          tx.txData?.dataDecoded?.method !== 'multiSend'
+            ? 1
+            : // Number of batched transactions
+              tx.txData.dataDecoded.parameters?.[0].valueDecoded?.length ?? 1;
+
+        // Typed as number; is hex
+        const blockNumber = Number(receipt.blockNumber);
+        const gasUsed = Number(receipt.gasUsed);
+
+        result.receipts = Array(calls).fill({
+          logs: receipt.logs,
+          status: numberToHex(tx.txStatus === TransactionStatus.SUCCESS ? 1 : 0),
+          blockHash: receipt.blockHash,
+          blockNumber: numberToHex(blockNumber),
+          gasUsed: numberToHex(gasUsed),
+          transactionHash: tx.txHash,
+        });
+
+        return result;
+      }
+
+      case 'wallet_showCallsStatus': {
+        // Cannot open transaction details page via SDK
+        throw new Error(`"${request.method}" not supported`);
+      }
+
+      case 'wallet_getCapabilities': {
+        return {
+          [numberToHex(this.chainId)]: {
+            atomicBatch: {
+              supported: true,
+            },
+          },
+        };
+      }
 
       default:
         throw Error(`"${request.method}" not implemented`);
