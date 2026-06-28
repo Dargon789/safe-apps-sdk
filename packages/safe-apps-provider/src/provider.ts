@@ -249,7 +249,7 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
           version: '1.0',
           id: safeTxHash,
           chainId: numberToHex(this.chainId),
-          status: CallStatus[tx.txStatus],
+          status: CallStatus[tx.txStatus] ?? 100,
         };
 
         // Transaction is queued
