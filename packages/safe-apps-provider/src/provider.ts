@@ -206,8 +206,8 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
           throw new Error(`Safe is not on chain ${chainId}`);
         }
 
-        if (from !== this.safe.safeAddress) {
-          throw Error('Invalid from address');
+        if (from && from.toLowerCase() !== this.safe.safeAddress.toLowerCase()) {
+          throw new Error('Invalid from address');
         }
 
         const txs = calls.map((call, i) => {
