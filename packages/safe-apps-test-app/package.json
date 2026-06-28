@@ -11,7 +11,7 @@
     "@safe-global/safe-apps-sdk": "^9.0.0",
     "ethers": "^6.13.4",
     "evergreen-ui": "^7.1.9",
-    "lerna": "8.1.9",
+    "lerna": "9.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
