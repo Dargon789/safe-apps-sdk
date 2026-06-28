@@ -278,7 +278,7 @@ class Safe {
         ],
       };
 
-      const response = await this.communicator.send<Methods.rpcCall, RPCPayload<[boolean]>, boolean>(
+      const response = await this.communicator.send<Methods.rpcCall, RPCPayload<[{ data: boolean }, string]>, boolean>(
         Methods.rpcCall,
         payload,
       );
