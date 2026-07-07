@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, TextInput, Text } from 'evergreen-ui';
+import { Button, Checkbox, Text } from 'evergreen-ui';
 import SdkInstance from '@safe-global/safe-apps-sdk';
 
 const Container = styled.div`
