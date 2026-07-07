@@ -9,18 +9,18 @@
 
 
   
-  export function () {
+  export function Button() {
     return (
       <div>
-        <style jsx>{`div { color: pink; }`}</style>
-        <h1>Welcome to !</h1>
+        <style jsx>{'div { color: pink; }'}</style>
+        <h1>Welcome to Button!</h1>
         
       </div>
     );
   }
   
 
-  export default ;
+  export default Button;
 
 
 
