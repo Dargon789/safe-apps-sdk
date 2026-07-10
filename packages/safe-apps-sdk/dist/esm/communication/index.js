@@ -17,7 +17,7 @@ class PostMessageCommunicator {
             return !emptyOrMalformed && sentFromParentEl && allowedSDKVersion && validOrigin;
         };
         this.logIncomingMessage = (msg) => {
-            console.info(`Safe Apps SDK v1: A message was received from origin ${msg.origin}. `, msg.data);
+            console.info("Safe Apps SDK v1: A message was received from origin %s. ", msg.origin, msg.data);
         };
         this.onParentMessage = (msg) => {
             if (this.isValidMessage(msg)) {
@@ -28,9 +28,11 @@ class PostMessageCommunicator {
         this.handleIncomingMessage = (payload) => {
             const { id } = payload;
             const cb = this.callbacks.get(id);
-            if (cb) {
+            if (typeof cb === 'function') {
                 cb(payload);
                 this.callbacks.delete(id);
+            } else {
+                console.error(`Callback for id ${id} is not a function or does not exist.`);
             }
         };
         this.send = (method, params) => {

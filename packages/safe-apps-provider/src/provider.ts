@@ -196,7 +196,11 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
         return this.sdk.eth.setSafeSettings([params[0]]);
 
       case 'wallet_sendCalls': {
-        const { from, calls, chainId }: SendCallsParams = params[0];
+        const params0 = params[0];
+        if (!params0 || !Array.isArray(params0.calls)) {
+          throw new Error('Invalid parameters: "calls" must be an array');
+        }
+        const { from, calls, chainId }: SendCallsParams = params0;
 
         if (chainId !== numberToHex(this.chainId)) {
           throw new Error(`Safe is not on chain ${chainId}`);
@@ -245,7 +249,7 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
           version: '1.0',
           id: safeTxHash,
           chainId: numberToHex(this.chainId),
-          status: CallStatus[tx.txStatus],
+          status: CallStatus[tx.txStatus] ?? 100,
         };
 
         // Transaction is queued
@@ -263,20 +267,20 @@ export class SafeAppProvider extends EventEmitter implements EIP1193Provider {
           tx.txData?.dataDecoded?.method !== 'multiSend'
             ? 1
             : // Number of batched transactions
-              tx.txData.dataDecoded.parameters?.[0].valueDecoded?.length ?? 1;
+              tx.txData?.dataDecoded?.parameters?.[0].valueDecoded?.length ?? 1;
 
         // Typed as number; is hex
         const blockNumber = Number(receipt.blockNumber);
         const gasUsed = Number(receipt.gasUsed);
 
-        result.receipts = Array(calls).fill({
+        result.receipts = Array.from({ length: calls }, () => ({
           logs: receipt.logs,
           status: numberToHex(tx.txStatus === TransactionStatus.SUCCESS ? 1 : 0),
           blockHash: receipt.blockHash,
           blockNumber: numberToHex(blockNumber),
           gasUsed: numberToHex(gasUsed),
           transactionHash: tx.txHash,
-        });
+        }));
 
         return result;
       }

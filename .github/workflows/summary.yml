@@ -1,0 +1,52 @@
+name: Summarize new issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      models: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Preprocess issue body
+        id: body_preprocess
+        shell: bash
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          # Use ISSUE_BODY environment variable
+          body="$ISSUE_BODY"
+          # Strip code fences and images
+          cleaned=$(echo "$body" \
+            | sed 's/```[^`]*```//g' \
+            | sed 's/!\[.*\](.*)//g')
+          # Truncate to first 1000 characters
+          truncated=$(echo "$cleaned" | head -c 1000)
+          echo "truncated_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$truncated" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Run AI inference
+        id: inference
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            Summarize the following GitHub issue in one paragraph:
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ steps.body_preprocess.outputs.truncated_body }}
+
+      - name: Comment with AI summary
+        run: |
+          gh issue comment $ISSUE_NUMBER --body '${{ steps.inference.outputs.response }}'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RESPONSE: ${{ steps.inference.outputs.response }}

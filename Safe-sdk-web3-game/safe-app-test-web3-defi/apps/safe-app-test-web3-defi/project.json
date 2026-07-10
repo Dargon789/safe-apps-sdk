@@ -1,0 +1,8 @@
+{
+  "name": "safe-app-test-web3-defi",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/safe-app-test-web3-defi/src",
+  "// targets": "to see all targets run: nx show project safe-app-test-web3-defi --web",
+  "targets": {}
+}

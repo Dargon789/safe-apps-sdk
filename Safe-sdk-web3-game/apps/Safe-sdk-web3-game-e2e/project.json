@@ -1,0 +1,9 @@
+{
+  "name": "Safe-sdk-web3-game-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/Safe-sdk-web3-game-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["Safe-sdk-web3-game"],
+  "// targets": "to see all targets run: nx show project Safe-sdk-web3-game-e2e --web",
+  "targets": {}
+}

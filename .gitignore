@@ -7,3 +7,8 @@ yalc.lock
 build
 .yalc
 .env
+
+
+
+.nx/cache
+.nx/workspace-data
