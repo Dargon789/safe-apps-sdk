@@ -37,7 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "@safe-global/safe-gateway-typescript-sdk": "^3.5.3",
-    "viem": "^2.1.1"
+    "viem": "^2.54.2"
   },
   "repository": {
     "type": "git",
